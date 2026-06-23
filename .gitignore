@@ -1,0 +1,67 @@
+# ---------------------------------------------------------------------------
+# Rust
+# ---------------------------------------------------------------------------
+/target
+**/target/
+**/*.rs.bk
+Cargo.lock.orig
+# Note: Cargo.lock IS committed (this workspace builds binaries).
+# Note: the sqlx offline cache (.sqlx/) IS committed — do not ignore it.
+
+# ---------------------------------------------------------------------------
+# Environment / secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------------------------------------------------------------------------
+# Frontend (SolidJS + Vite + pnpm)
+# ---------------------------------------------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/.turbo/
+frontend/*.local
+node_modules/
+.pnpm-store/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# ---------------------------------------------------------------------------
+# Editor / IDE / OS
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.github/*
+legacy-app/*
+.devcontainer/devcontainer-*.json
+
+# ---------------------------------------------------------------------------
+# Local data / scratch / logs
+# ---------------------------------------------------------------------------
+/data/
+/tmp/
+*.log
+HANDOFF.md
+samples/
+crates/fax-tiff/test
+
+# ---------------------------------------------------------------------------
+# Legacy VB build artifacts (reference tree only)
+# ---------------------------------------------------------------------------
+legacy-app/**/bin/
+legacy-app/**/obj/
+legacy-app/**/*.suo
+legacy-app/**/*.user

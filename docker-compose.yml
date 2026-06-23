@@ -1,0 +1,36 @@
+# HL7 Viewer & Editor — container setup for testing on a dev machine.
+#
+#   Production-style static serve (default):
+#       docker compose up --build
+#       → open http://localhost:8080
+#
+#   Hot-reloading dev server (Vite, source-mounted):
+#       docker compose --profile dev up
+#       → open http://localhost:5173
+#
+# This app is a purely static, in-browser tool: no backend, no database, and no
+# HL7 data ever leaves the browser.
+
+services:
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: hl7-viewer:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # Optional: live-reload development server. Source is bind-mounted; the
+  # container keeps its own node_modules via an anonymous volume.
+  dev:
+    image: node:24-bookworm-slim
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm dev --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    profiles:
+      - dev

@@ -1,0 +1,17 @@
+/** Synthetic example messages for the "Load example" button. NO real PHI. */
+
+export const ADT_A01 = [
+  "MSH|^~\\&|SENDAPP|SENDFAC|RECVAPP|RECVFAC|20260623120000||ADT^A01|MSG00001|P|2.4",
+  "EVN|A01|20260623120000",
+  "PID|1||MRN12345^^^HOSP^MR~2950500011^^^AUSHIC^MC||DOE^JANE^Q||19850312|F|||123 MAIN ST^^METROPOLIS^WA^6000^AU||(08)90001234",
+  "NK1|1|DOE^JOHN|SPO|123 MAIN ST^^METROPOLIS^WA^6000^AU|(08)90001234",
+  "PV1|1|I|WARD^101^A|||||||SUR||||||||VISIT9999",
+].join("\r");
+
+export const ORU_R01 = [
+  "MSH|^~\\&|RADIS|PRC|GP|CLINIC|20260623081500||ORU^R01|RPT0001|P|2.4",
+  "PID|1||8003608166690503^^^AUSHIC^NI||SMITH^JOHN^A||19700101|M|||45 OCEAN DR^^PERTH^WA^6000^AU",
+  "OBR|1||ACC123|CXR^Chest X-Ray^L|||20260623080000|||||||||1234567T^RADIOLOGIST^A^^^^^^AUSHICPR^^^^NPI",
+  "OBX|1|TX|IMPRESSION^Impression^L||No acute cardiopulmonary process.||||||F",
+  "OBX|2|TX|TECHNIQUE^Technique^L||PA and lateral chest radiographs.||||||F",
+].join("\r");
