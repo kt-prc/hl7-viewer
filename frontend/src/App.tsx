@@ -10,6 +10,11 @@ import RawPanel from "./components/RawPanel";
 import StructuredView from "./components/StructuredView";
 import BottomPanel from "./components/BottomPanel";
 import DeidentifyDialog from "./components/DeidentifyDialog";
+import Splitter from "./components/Splitter";
+
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+/** Min width reserved for the centre Structure column while dragging. */
+const STRUCTURE_MIN = 320;
 
 function EmptyHint() {
   return (
@@ -47,7 +52,25 @@ function CollapsedSourceRail(props: { onExpand: () => void }) {
 export default function App() {
   const [deidOpen, setDeidOpen] = createSignal(false);
   const [sourceCollapsed, setSourceCollapsed] = createSignal(false);
+  const [sourceWidth, setSourceWidth] = createSignal(300);
+  const [rawWidth, setRawWidth] = createSignal(400);
   const hasMessages = () => store.messageCount() > 0;
+
+  let mainRef: HTMLElement | undefined;
+
+  const resizeSource = (clientX: number) => {
+    const rect = mainRef?.getBoundingClientRect();
+    if (!rect) return;
+    const max = rect.width - rawWidth() - STRUCTURE_MIN;
+    setSourceWidth(clamp(clientX - rect.left, 180, Math.max(180, max)));
+  };
+  const resizeRaw = (clientX: number) => {
+    const rect = mainRef?.getBoundingClientRect();
+    if (!rect) return;
+    const usedLeft = sourceCollapsed() ? 36 : sourceWidth();
+    const max = rect.width - usedLeft - STRUCTURE_MIN;
+    setRawWidth(clamp(rect.right - clientX, 240, Math.max(240, max)));
+  };
 
   return (
     <div class="flex h-full flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -76,17 +99,20 @@ export default function App() {
 
       <div class="flex min-h-0 flex-1 flex-col">
         <MessageTabs />
-        <main class="flex min-h-0 flex-1">
+        <main ref={mainRef} class="flex min-h-0 flex-1">
           <Show
             when={!sourceCollapsed()}
             fallback={<CollapsedSourceRail onExpand={() => setSourceCollapsed(false)} />}
           >
-            <div class="w-[26%] min-w-[240px] max-w-[440px] shrink-0 border-r border-slate-200 dark:border-slate-700">
-              <SourcePanel onCollapse={() => setSourceCollapsed(true)} />
-            </div>
+            <>
+              <div class="shrink-0" style={{ width: `${sourceWidth()}px` }}>
+                <SourcePanel onCollapse={() => setSourceCollapsed(true)} />
+              </div>
+              <Splitter title="Drag to resize the Source column" onResize={resizeSource} />
+            </>
           </Show>
 
-          <section class="flex min-w-0 flex-1 flex-col border-r border-slate-200 dark:border-slate-700">
+          <section class="flex min-w-0 flex-1 flex-col">
             <PanelHeader title="Structure" />
             <div class="min-h-0 flex-1">
               <Show when={store.activeMessage()} fallback={<EmptyHint />}>
@@ -95,7 +121,9 @@ export default function App() {
             </div>
           </section>
 
-          <div class="flex w-[34%] min-w-[300px] shrink-0 flex-col">
+          <Splitter title="Drag to resize the Raw column" onResize={resizeRaw} />
+
+          <div class="flex shrink-0 flex-col" style={{ width: `${rawWidth()}px` }}>
             <Show
               when={store.activeMessage()}
               fallback={
