@@ -1,5 +1,5 @@
 import { Show, createSignal } from "solid-js";
-import { Activity } from "lucide-solid";
+import { Activity, PanelLeftOpen } from "lucide-solid";
 import { store } from "./state/store";
 import PrivacyBadge from "./components/PrivacyBadge";
 import ThemeToggle from "./components/ThemeToggle";
@@ -27,8 +27,26 @@ function PanelHeader(props: { title: string }) {
   );
 }
 
+function CollapsedSourceRail(props: { onExpand: () => void }) {
+  return (
+    <div class="flex w-9 shrink-0 flex-col items-center gap-2 border-r border-slate-200 bg-white py-2 dark:border-slate-700 dark:bg-slate-900">
+      <button
+        class="grid h-7 w-7 place-items-center rounded text-slate-500 hover:bg-slate-100 hover:text-prc-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-prc-100"
+        title="Expand source panel"
+        onClick={props.onExpand}
+      >
+        <PanelLeftOpen size={16} />
+      </button>
+      <span class="select-none text-[11px] font-semibold uppercase tracking-wide text-slate-400 [writing-mode:vertical-rl] dark:text-slate-500">
+        Source
+      </span>
+    </div>
+  );
+}
+
 export default function App() {
   const [deidOpen, setDeidOpen] = createSignal(false);
+  const [sourceCollapsed, setSourceCollapsed] = createSignal(false);
   const hasMessages = () => store.messageCount() > 0;
 
   return (
@@ -59,9 +77,14 @@ export default function App() {
       <div class="flex min-h-0 flex-1 flex-col">
         <MessageTabs />
         <main class="flex min-h-0 flex-1">
-          <div class="w-[26%] min-w-[240px] max-w-[440px] shrink-0 border-r border-slate-200 dark:border-slate-700">
-            <SourcePanel />
-          </div>
+          <Show
+            when={!sourceCollapsed()}
+            fallback={<CollapsedSourceRail onExpand={() => setSourceCollapsed(false)} />}
+          >
+            <div class="w-[26%] min-w-[240px] max-w-[440px] shrink-0 border-r border-slate-200 dark:border-slate-700">
+              <SourcePanel onCollapse={() => setSourceCollapsed(true)} />
+            </div>
+          </Show>
 
           <section class="flex min-w-0 flex-1 flex-col border-r border-slate-200 dark:border-slate-700">
             <PanelHeader title="Structure" />

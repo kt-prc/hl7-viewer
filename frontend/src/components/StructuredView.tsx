@@ -1,5 +1,5 @@
 import { For, Show, createSignal, type JSX } from "solid-js";
-import { ArrowUp, ArrowDown, CopyPlus, Trash2 } from "lucide-solid";
+import { ArrowUp, ArrowDown, CopyPlus, Trash2, ChevronRight, ChevronDown } from "lucide-solid";
 import { store, type Selection } from "../state/store";
 import { Delimiters, Field, Hl7Message, Segment, indexToFieldNumber } from "../hl7/types";
 import {
@@ -22,6 +22,7 @@ function componentText(field: Field, component: number, d: Delimiters): string {
 /** The editable, dictionary-annotated tree — the primary editing surface. */
 export default function StructuredView(props: { message: Hl7Message }) {
   const [expanded, setExpanded] = createSignal<Set<string>>(new Set());
+  const [collapsed, setCollapsed] = createSignal<Set<number>>(new Set());
   const profile = store.profile;
   const sel = () => store.state.selection;
 
@@ -29,6 +30,13 @@ export default function StructuredView(props: { message: Hl7Message }) {
     setExpanded((prev) => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+
+  const toggleCollapse = (index: number) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      next.has(index) ? next.delete(index) : next.add(index);
       return next;
     });
 
@@ -42,6 +50,8 @@ export default function StructuredView(props: { message: Hl7Message }) {
             message={props.message}
             expanded={expanded()}
             toggle={toggle}
+            collapsed={collapsed().has(si())}
+            onToggleCollapse={() => toggleCollapse(si())}
             selected={sel()}
             profile={profile()}
           />
@@ -57,6 +67,8 @@ function SegmentBlock(props: {
   message: Hl7Message;
   expanded: Set<string>;
   toggle: (key: string) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
   selected: Selection | null;
   profile: ReturnType<typeof store.profile>;
 }) {
@@ -65,15 +77,29 @@ function SegmentBlock(props: {
 
   return (
     <div class="border-b border-slate-200 dark:border-slate-700">
-      <div class="sticky top-0 z-10 flex items-center justify-between gap-2 bg-prc-50 px-3 py-1.5 dark:bg-slate-800">
-        <div class="flex items-baseline gap-2">
+      <div class="sticky top-0 z-10 flex items-center justify-between gap-2 bg-prc-50 px-2 py-1.5 dark:bg-slate-800">
+        <button
+          class="flex min-w-0 items-center gap-2 text-left"
+          title={props.collapsed ? "Expand segment" : "Collapse segment"}
+          onClick={props.onToggleCollapse}
+        >
+          <span class="grid h-5 w-5 shrink-0 place-items-center rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+            <Show when={props.collapsed} fallback={<ChevronDown size={15} />}>
+              <ChevronRight size={15} />
+            </Show>
+          </span>
           <span class="font-mono text-sm font-bold text-prc-600 dark:text-prc-100">
             {props.segment.id}
           </span>
-          <span class="text-sm text-slate-500 dark:text-slate-400">
+          <span class="truncate text-sm text-slate-500 dark:text-slate-400">
             {def()?.name ?? "Unknown segment"}
           </span>
-        </div>
+          <Show when={props.collapsed}>
+            <span class="shrink-0 text-[11px] text-slate-400 dark:text-slate-500">
+              ({props.segment.fields.length} fields)
+            </span>
+          </Show>
+        </button>
         <div class="flex items-center gap-0.5 text-xs">
           <SegBtn title="Move up" onClick={() => store.moveSegment(props.segmentIndex, -1)}>
             <ArrowUp size={14} />
@@ -90,6 +116,7 @@ function SegmentBlock(props: {
         </div>
       </div>
 
+      <Show when={!props.collapsed}>
       <div class="divide-y divide-slate-100 dark:divide-slate-800">
         <For each={props.segment.fields}>
           {(field, fi) => {
@@ -210,6 +237,7 @@ function SegmentBlock(props: {
       <div class="px-3 py-1">
         <AddSegmentInline segmentIndex={props.segmentIndex} />
       </div>
+      </Show>
     </div>
   );
 }

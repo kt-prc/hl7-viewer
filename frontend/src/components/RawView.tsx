@@ -4,8 +4,9 @@ import { Hl7Message } from "../hl7/types";
 import { indexToFieldNumber } from "../hl7/types";
 
 /** Syntax-highlighted raw HL7. Clicking a field selects it (links to the tree). */
-export default function RawView(props: { message: Hl7Message }) {
+export default function RawView(props: { message: Hl7Message; wrap?: boolean }) {
   const sel = () => store.state.selection;
+  const wrap = () => props.wrap !== false;
 
   return (
     <div class="h-full overflow-auto bg-slate-50 p-3 font-mono text-[13px] leading-relaxed text-slate-800 dark:bg-slate-950 dark:text-slate-100">
@@ -13,7 +14,7 @@ export default function RawView(props: { message: Hl7Message }) {
         {(segment, si) => {
           const tokens = segment.raw.split(props.message.delimiters.field);
           return (
-            <div class="whitespace-pre-wrap break-all">
+            <div classList={{ "whitespace-pre-wrap break-all": wrap(), "w-max whitespace-pre": !wrap() }}>
               <span class="font-semibold text-prc-600 dark:text-prc-100">{tokens[0]}</span>
               <For each={tokens.slice(1)}>
                 {(token, ti) => {

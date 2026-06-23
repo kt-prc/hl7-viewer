@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
-import { Upload, Eraser, FlaskConical } from "lucide-solid";
+import { Upload, Eraser, FlaskConical, PanelLeftClose } from "lucide-solid";
 import { store } from "../state/store";
 import { ADT_A01, ORU_R01 } from "../sampleData";
 
@@ -8,7 +8,7 @@ import { ADT_A01, ORU_R01 } from "../sampleData";
  * use is pasting) and stays editable: typing re-parses live, and edits made in
  * the Structure/Raw views flow back into the text here.
  */
-export default function SourcePanel() {
+export default function SourcePanel(props: { onCollapse?: () => void }) {
   const [text, setText] = createSignal(store.documentText());
   // Guards the feedback loop: when the change originated from typing here we
   // must not overwrite the user's exact text with the re-serialized version.
@@ -36,11 +36,20 @@ export default function SourcePanel() {
 
   return (
     <div class="flex h-full flex-col bg-white dark:bg-slate-900">
-      <div class="flex items-center justify-between border-b border-slate-200 px-3 py-1.5 dark:border-slate-700">
+      <div class="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-1.5 dark:border-slate-700">
         <span class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
           Source
         </span>
-        <span class="text-[11px] text-slate-400 dark:text-slate-500">edits re-parse live</span>
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">edits re-parse live</span>
+          <button
+            class="grid h-6 w-6 place-items-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            title="Collapse source panel"
+            onClick={() => props.onCollapse?.()}
+          >
+            <PanelLeftClose size={15} />
+          </button>
+        </div>
       </div>
 
       <textarea
