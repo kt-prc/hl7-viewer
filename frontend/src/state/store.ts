@@ -2,7 +2,7 @@ import { createMemo, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Hl7Message, Segment } from "../hl7/types";
 import { parseMessages, parseField } from "../hl7/parser";
-import { serializeSegment } from "../hl7/serializer";
+import { serializeSegment, serializeMessages } from "../hl7/serializer";
 import { setSubcomponent, replaceField, getField } from "../hl7/accessors";
 import { resolveActiveProfile, DEFAULT_PROFILE_ID } from "../hl7/dictionary";
 import { validateMessage } from "../hl7/validate";
@@ -56,6 +56,9 @@ function updateActive(updater: (m: Hl7Message) => Hl7Message): void {
 const derived = createRoot(() => ({
   activeMessage: createMemo<Hl7Message | undefined>(() => state.messages[state.activeIndex]),
   profile: createMemo(() => resolveActiveProfile(state.profileId)),
+  documentText: createMemo(() =>
+    state.messages.length ? serializeMessages(state.messages, "\r") : "",
+  ),
 }));
 
 const issues = createRoot(() =>
@@ -78,6 +81,7 @@ export const store = {
   // selectors
   activeMessage: derived.activeMessage,
   profile: derived.profile,
+  documentText: derived.documentText,
   issues,
   matches,
   messageCount: () => state.messages.length,
@@ -86,6 +90,16 @@ export const store = {
   loadText(text: string): void {
     const messages = parseMessages(text);
     setState({ messages, activeIndex: 0, selection: null, searchQuery: "", lastDeid: null });
+  },
+
+  /**
+   * Reparse the whole document from edited source text, preserving the active
+   * index and search where still valid. Used by the live-editable paste box.
+   */
+  replaceDocument(text: string): void {
+    const messages = parseMessages(text);
+    const activeIndex = Math.min(state.activeIndex, Math.max(0, messages.length - 1));
+    setState({ messages, activeIndex, selection: null, lastDeid: null });
   },
 
   clearAll(): void {

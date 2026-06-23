@@ -11,6 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "lucide-solid": "^1.21.0",
     "solid-js": "^1.9.3"
   },
   "devDependencies": {

@@ -39,11 +39,13 @@ export default function DeidentifyDialog(props: { open: boolean; onClose: () => 
         onClick={props.onClose}
       >
         <div
-          class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl"
+          class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 class="text-lg font-semibold text-slate-800">De-identify message</h2>
-          <p class="mt-1 text-sm text-slate-500">
+          <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100">
+            De-identify message
+          </h2>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Scrubs PHI in this tab only. Nothing is sent anywhere.
           </p>
 
@@ -58,13 +60,13 @@ export default function DeidentifyDialog(props: { open: boolean; onClose: () => 
                     <input
                       type="radio"
                       name="strategy"
-                      class="mt-0.5"
+                      class="mt-0.5 accent-prc-600"
                       checked={strategy() === s.id}
                       onChange={() => setStrategy(s.id)}
                     />
                     <span>
-                      <span class="font-medium text-slate-700">{s.label}</span>
-                      <span class="block text-xs text-slate-500">{s.hint}</span>
+                      <span class="font-medium text-slate-700 dark:text-slate-200">{s.label}</span>
+                      <span class="block text-xs text-slate-500 dark:text-slate-400">{s.hint}</span>
                     </span>
                   </label>
                 )}
@@ -79,9 +81,10 @@ export default function DeidentifyDialog(props: { open: boolean; onClose: () => 
             <div class="mt-2 grid grid-cols-2 gap-1.5">
               <For each={ALL_PHI_CATEGORIES}>
                 {(c) => (
-                  <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                  <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
                     <input
                       type="checkbox"
+                      class="accent-prc-600"
                       checked={categories().has(c)}
                       onChange={() => toggleCat(c)}
                     />
@@ -94,13 +97,13 @@ export default function DeidentifyDialog(props: { open: boolean; onClose: () => 
 
           <div class="mt-5 flex justify-end gap-2">
             <button
-              class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               onClick={props.onClose}
             >
               Cancel
             </button>
             <button
-              class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-40"
+              class="rounded-lg bg-coral-500 px-4 py-2 text-sm font-medium text-white hover:bg-coral-600 disabled:opacity-40"
               disabled={categories().size === 0}
               onClick={apply}
             >

@@ -24,25 +24,31 @@ export default function FieldInspector() {
   };
 
   return (
-    <div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+    <div class="px-4 py-3 text-sm">
       <Show
         when={info()}
-        fallback={<p class="text-slate-400">Select a field to see its HL7 definition.</p>}
+        fallback={
+          <p class="text-slate-400 dark:text-slate-500">
+            Select a field to see its HL7 definition.
+          </p>
+        }
       >
         {(i) => (
           <div class="flex flex-col gap-1">
-            <div class="flex items-center gap-2">
-              <span class="font-mono font-bold text-sky-700">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono font-bold text-prc-600 dark:text-prc-100">
                 {i().segmentId}-{i().fieldNumber}
               </span>
-              <span class="font-medium text-slate-800">{i().field?.name ?? "Unknown field"}</span>
+              <span class="font-medium text-slate-800 dark:text-slate-100">
+                {i().field?.name ?? "Unknown field"}
+              </span>
               <Show when={i().phi}>
-                <span class="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
+                <span class="rounded bg-warm-100 px-1.5 py-0.5 text-[10px] font-medium text-coral-600 dark:bg-coral-600/20 dark:text-coral-500">
                   PHI · {i().phi!.label}
                 </span>
               </Show>
             </div>
-            <div class="flex gap-4 text-xs text-slate-500">
+            <div class="flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
               <Show when={i().segmentName}>
                 <span>Segment: {i().segmentName}</span>
               </Show>
@@ -54,7 +60,7 @@ export default function FieldInspector() {
               </Show>
             </div>
             <Show when={i().field?.description}>
-              <p class="mt-1 text-xs text-slate-600">{i().field!.description}</p>
+              <p class="mt-1 text-xs text-slate-600 dark:text-slate-300">{i().field!.description}</p>
             </Show>
           </div>
         )}

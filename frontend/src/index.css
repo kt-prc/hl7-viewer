@@ -1,11 +1,40 @@
 @import "tailwindcss";
 
-/* System font stack — no external font downloads (privacy + offline). */
+/* Explicit dark mode driven by a `.dark` class on <html> (set by the theme
+   store), rather than the prefers-color-scheme default — so "auto" can be
+   resolved in JS and overridden by an explicit user choice. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  /* Arial per brand guidelines. */
+  --font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono",
     Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* PRC brand — blues */
+  --color-prc-50: #e5ebf7;
+  --color-prc-100: #baceeb;
+  --color-prc-300: #557ebd;
+  --color-prc-500: #0a5a96;
+  --color-prc-600: #00406e;
+  --color-prc-700: #003156;
+  --color-prc-800: #00233d;
+  --color-prc-accent: #5d6bb2;
+
+  /* brand — greens */
+  --color-grn-50: #e4ebe1;
+  --color-grn-200: #abb5b3;
+  --color-grn-300: #a3bd99;
+  --color-grn-500: #6b7b7a;
+  --color-grn-700: #445d5a;
+
+  /* brand — warms */
+  --color-warm-50: #f9f4f1;
+  --color-warm-100: #f3dace;
+  --color-warm-200: #ebbfa8;
+  --color-warm-400: #c6906e;
+  --color-coral-500: #eb735b;
+  --color-coral-600: #d8543b;
 }
 
 html,
@@ -16,4 +45,9 @@ body,
 
 body {
   margin: 0;
+}
+
+/* Thin, theme-aware scrollbars for the dense panels. */
+* {
+  scrollbar-width: thin;
 }

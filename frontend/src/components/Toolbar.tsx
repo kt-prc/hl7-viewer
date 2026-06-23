@@ -1,9 +1,10 @@
 import { Show, createSignal } from "solid-js";
+import { Copy, Check, Download, VenetianMask } from "lucide-solid";
 import { store } from "../state/store";
 import { serializeMessage, LineEnding } from "../hl7/serializer";
 import { profileOptions } from "../hl7/dictionary";
 
-/** Top-bar actions: dictionary profile, copy, download, de-identify, clear. */
+/** Top-bar actions: dictionary profile, copy, download, de-identify. */
 export default function Toolbar(props: { onOpenDeidentify: () => void }) {
   const [copied, setCopied] = createSignal(false);
   const [eol, setEol] = createSignal<LineEnding>("\r");
@@ -30,10 +31,13 @@ export default function Toolbar(props: { onOpenDeidentify: () => void }) {
     URL.revokeObjectURL(url);
   };
 
+  const btn =
+    "inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:border-slate-400 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800";
+
   return (
     <div class="flex flex-wrap items-center gap-2">
       <select
-        class="rounded-md border border-slate-300 px-2 py-1 text-sm focus:border-sky-500 focus:outline-none"
+        class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-prc-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
         title="Dictionary profile"
         value={store.state.profileId}
         onChange={(e) => store.setProfile(e.currentTarget.value)}
@@ -43,24 +47,23 @@ export default function Toolbar(props: { onOpenDeidentify: () => void }) {
         ))}
       </select>
 
-      <div class="mx-1 h-5 w-px bg-slate-200" />
-
-      <button
-        class="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        onClick={copy}
-      >
-        {copied() ? "Copied ✓" : "Copy"}
+      <button class={btn} onClick={copy}>
+        <Show when={copied()} fallback={<Copy size={15} />}>
+          <Check size={15} class="text-grn-700 dark:text-grn-300" />
+        </Show>
+        {copied() ? "Copied" : "Copy"}
       </button>
 
-      <div class="flex items-center overflow-hidden rounded-md border border-slate-300">
+      <div class="flex items-center overflow-hidden rounded-md border border-slate-300 dark:border-slate-600">
         <button
-          class="px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
           onClick={download}
         >
+          <Download size={15} />
           Download
         </button>
         <select
-          class="border-l border-slate-300 bg-slate-50 px-1.5 py-1 text-xs text-slate-600 focus:outline-none"
+          class="border-l border-slate-300 bg-slate-50 px-1.5 py-1.5 text-xs text-slate-600 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
           title="Line ending"
           value={eol()}
           onChange={(e) => setEol(e.currentTarget.value as LineEnding)}
@@ -72,23 +75,17 @@ export default function Toolbar(props: { onOpenDeidentify: () => void }) {
       </div>
 
       <button
-        class="rounded-md bg-rose-50 px-3 py-1 text-sm font-medium text-rose-700 ring-1 ring-rose-200 hover:bg-rose-100"
+        class="inline-flex items-center gap-1.5 rounded-md bg-warm-100 px-2.5 py-1.5 text-sm font-medium text-coral-600 ring-1 ring-warm-200 transition-colors hover:bg-warm-200 dark:bg-coral-600/15 dark:text-coral-500 dark:ring-coral-600/40 dark:hover:bg-coral-600/25"
         onClick={props.onOpenDeidentify}
       >
-        De-identify…
-      </button>
-
-      <button
-        class="rounded-md px-3 py-1 text-sm font-medium text-slate-500 hover:bg-slate-100"
-        onClick={() => store.clearAll()}
-      >
-        Clear
+        <VenetianMask size={15} />
+        De-identify
       </button>
 
       <Show when={store.state.lastDeid}>
-        <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs text-emerald-700">
+        <span class="inline-flex items-center gap-1 rounded-md bg-grn-50 px-2 py-1 text-xs text-grn-700 dark:bg-grn-700/20 dark:text-grn-300">
           De-identified {store.state.lastDeid!.length} field(s)
-          <button class="ml-1 underline" onClick={() => store.clearDeidReport()}>
+          <button class="underline" onClick={() => store.clearDeidReport()}>
             dismiss
           </button>
         </span>

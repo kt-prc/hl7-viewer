@@ -1,4 +1,5 @@
-import { For, Show, createSignal } from "solid-js";
+import { For, Show, createSignal, type JSX } from "solid-js";
+import { ArrowUp, ArrowDown, CopyPlus, Trash2 } from "lucide-solid";
 import { store, type Selection } from "../state/store";
 import { Delimiters, Field, Hl7Message, Segment, indexToFieldNumber } from "../hl7/types";
 import {
@@ -32,7 +33,7 @@ export default function StructuredView(props: { message: Hl7Message }) {
     });
 
   return (
-    <div class="h-full overflow-auto bg-white">
+    <div class="h-full overflow-auto bg-white dark:bg-slate-900">
       <For each={props.message.segments}>
         {(segment, si) => (
           <SegmentBlock
@@ -63,21 +64,33 @@ function SegmentBlock(props: {
   const d = props.message.delimiters;
 
   return (
-    <div class="border-b border-slate-200">
-      <div class="sticky top-0 z-10 flex items-center justify-between gap-2 bg-slate-100 px-3 py-1.5">
+    <div class="border-b border-slate-200 dark:border-slate-700">
+      <div class="sticky top-0 z-10 flex items-center justify-between gap-2 bg-prc-50 px-3 py-1.5 dark:bg-slate-800">
         <div class="flex items-baseline gap-2">
-          <span class="font-mono text-sm font-bold text-slate-800">{props.segment.id}</span>
-          <span class="text-sm text-slate-500">{def()?.name ?? "Unknown segment"}</span>
+          <span class="font-mono text-sm font-bold text-prc-600 dark:text-prc-100">
+            {props.segment.id}
+          </span>
+          <span class="text-sm text-slate-500 dark:text-slate-400">
+            {def()?.name ?? "Unknown segment"}
+          </span>
         </div>
-        <div class="flex items-center gap-1 text-xs">
-          <SegBtn label="↑" title="Move up" onClick={() => store.moveSegment(props.segmentIndex, -1)} />
-          <SegBtn label="↓" title="Move down" onClick={() => store.moveSegment(props.segmentIndex, 1)} />
-          <SegBtn label="⧉" title="Duplicate" onClick={() => store.duplicateSegment(props.segmentIndex)} />
-          <SegBtn label="✕" title="Delete segment" onClick={() => store.removeSegment(props.segmentIndex)} />
+        <div class="flex items-center gap-0.5 text-xs">
+          <SegBtn title="Move up" onClick={() => store.moveSegment(props.segmentIndex, -1)}>
+            <ArrowUp size={14} />
+          </SegBtn>
+          <SegBtn title="Move down" onClick={() => store.moveSegment(props.segmentIndex, 1)}>
+            <ArrowDown size={14} />
+          </SegBtn>
+          <SegBtn title="Duplicate" onClick={() => store.duplicateSegment(props.segmentIndex)}>
+            <CopyPlus size={14} />
+          </SegBtn>
+          <SegBtn title="Delete segment" onClick={() => store.removeSegment(props.segmentIndex)} danger>
+            <Trash2 size={14} />
+          </SegBtn>
         </div>
       </div>
 
-      <div class="divide-y divide-slate-100">
+      <div class="divide-y divide-slate-100 dark:divide-slate-800">
         <For each={props.segment.fields}>
           {(field, fi) => {
             const fieldNumber = indexToFieldNumber(props.segment.id, fi());
@@ -97,14 +110,17 @@ function SegmentBlock(props: {
 
             return (
               <div
-                classList={{ "px-3 py-1.5": true, "bg-amber-50": isSelected() }}
+                classList={{
+                  "px-3 py-1.5": true,
+                  "bg-warm-50 dark:bg-slate-800": isSelected(),
+                }}
                 onClick={() =>
                   store.select({ segmentIndex: props.segmentIndex, fieldNumber })
                 }
               >
                 <div class="flex items-center gap-2">
                   <button
-                    class="w-6 shrink-0 text-left text-slate-400 hover:text-slate-700"
+                    class="w-6 shrink-0 text-left text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                     classList={{ invisible: !hasComponents() }}
                     title="Show components"
                     onClick={(e) => {
@@ -115,27 +131,30 @@ function SegmentBlock(props: {
                     {props.expanded.has(key) ? "▾" : "▸"}
                   </button>
                   <span
-                    class="w-20 shrink-0 font-mono text-xs text-sky-700"
+                    class="w-20 shrink-0 font-mono text-xs text-prc-600 dark:text-prc-100"
                     title={fdef()?.datatype ? `Datatype: ${fdef()?.datatype}` : undefined}
                   >
                     {props.segment.id}-{fieldNumber}
                   </span>
-                  <span class="w-56 shrink-0 truncate text-xs text-slate-600" title={fdef()?.description}>
+                  <span
+                    class="w-56 shrink-0 truncate text-xs text-slate-600 dark:text-slate-300"
+                    title={fdef()?.description}
+                  >
                     {fdef()?.name ?? <span class="italic text-slate-400">unknown</span>}
                     <Show when={fdef()?.optionality === "R"}>
-                      <span class="ml-1 text-red-500" title="Required">*</span>
+                      <span class="ml-1 text-coral-500" title="Required">*</span>
                     </Show>
                   </span>
                   <Show when={phi()}>
                     <span
-                      class="shrink-0 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700"
+                      class="shrink-0 rounded bg-warm-100 px-1.5 py-0.5 text-[10px] font-medium text-coral-600 dark:bg-coral-600/20 dark:text-coral-500"
                       title={phi()!.label}
                     >
                       PHI
                     </span>
                   </Show>
                   <input
-                    class="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1.5 py-0.5 font-mono text-sm hover:border-slate-200 focus:border-sky-400 focus:bg-white focus:outline-none"
+                    class="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1.5 py-0.5 font-mono text-sm text-slate-800 hover:border-slate-200 focus:border-prc-400 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-slate-600 dark:focus:bg-slate-900"
                     value={fieldToText(field, d)}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) =>
@@ -150,7 +169,7 @@ function SegmentBlock(props: {
                 </div>
 
                 <Show when={props.expanded.has(key) && hasComponents()}>
-                  <div class="ml-8 mt-1 flex flex-col gap-1 border-l-2 border-slate-100 pl-3">
+                  <div class="ml-8 mt-1 flex flex-col gap-1 border-l-2 border-slate-100 pl-3 dark:border-slate-700">
                     <For each={field[0] ?? []}>
                       {(_comp, ci) => {
                         const compNum = ci() + 1;
@@ -161,11 +180,11 @@ function SegmentBlock(props: {
                             <span class="w-20 shrink-0 font-mono text-[11px] text-slate-400">
                               .{compNum}
                             </span>
-                            <span class="w-52 shrink-0 truncate text-[11px] text-slate-500">
+                            <span class="w-52 shrink-0 truncate text-[11px] text-slate-500 dark:text-slate-400">
                               {cdef()?.name ?? ""}
                             </span>
                             <input
-                              class="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1.5 py-0.5 font-mono text-xs hover:border-slate-200 focus:border-sky-400 focus:bg-white focus:outline-none"
+                              class="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1.5 py-0.5 font-mono text-xs text-slate-800 hover:border-slate-200 focus:border-prc-400 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-slate-600 dark:focus:bg-slate-900"
                               value={componentText(field, compNum, d)}
                               onChange={(e) =>
                                 store.setComponentText(
@@ -195,17 +214,27 @@ function SegmentBlock(props: {
   );
 }
 
-function SegBtn(props: { label: string; title: string; onClick: () => void }) {
+function SegBtn(props: {
+  title: string;
+  onClick: () => void;
+  danger?: boolean;
+  children: JSX.Element;
+}) {
   return (
     <button
-      class="rounded px-1.5 py-0.5 text-slate-500 hover:bg-slate-200 hover:text-slate-800"
+      classList={{
+        "grid h-6 w-6 place-items-center rounded transition-colors": true,
+        "text-slate-500 hover:bg-coral-500 hover:text-white": props.danger,
+        "text-slate-500 hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-slate-700 dark:hover:text-slate-100":
+          !props.danger,
+      }}
       title={props.title}
       onClick={(e) => {
         e.stopPropagation();
         props.onClick();
       }}
     >
-      {props.label}
+      {props.children}
     </button>
   );
 }
@@ -224,14 +253,14 @@ function AddSegmentInline(props: { segmentIndex: number }) {
       }}
     >
       <input
-        class="w-24 rounded border border-slate-200 px-2 py-0.5 font-mono text-xs uppercase focus:border-sky-400 focus:outline-none"
+        class="w-24 rounded border border-slate-200 bg-transparent px-2 py-0.5 font-mono text-xs uppercase text-slate-700 focus:border-prc-400 focus:outline-none dark:border-slate-700 dark:text-slate-200"
         placeholder="+ SEG"
         maxLength={4}
         value={id()}
         onInput={(e) => setId(e.currentTarget.value)}
       />
       <Show when={id().trim()}>
-        <button class="text-xs text-sky-600 hover:underline" type="submit">
+        <button class="text-xs text-prc-600 hover:underline dark:text-prc-100" type="submit">
           add segment below
         </button>
       </Show>
